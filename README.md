@@ -1,1 +1,1 @@
-This is a jewellary website containing two profiles - User & Admin(Owner)s
+This is a jewellary website containing two profiles - User & Admin(Owner)
