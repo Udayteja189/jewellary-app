@@ -1,59 +1,42 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { RootState } from "../organisms/Home";
-import { Grid, Stack, Button, Typography } from "@mui/material";
+import { useParams } from "react-router-dom";
+import { RootState } from "../Home";
+import { Grid, Stack, Button, IconButton, Typography } from "@mui/material";
 import Icon from "../atoms/Icon";
 import { selectProducts } from "../../redux/actions/ProductActions";
-import { toast } from "sonner";
 
 const IndividualProduct = () => {
-
   const param = useParams();
-
   const dispatch = useDispatch();
-
-  const navigate = useNavigate();
-
   const products = useSelector(
     (state: RootState) => state.allProducts.products
   );
-
+  console.log(param);
   const product = products.filter((p) => p.index === param.id)[0];
-
   const handleItemAddedToCart = (id: string) => {
-    toast.success("Item added to cart",{duration:1000})
+    console.log("added to cart");
     dispatch(selectProducts(id));
   };
   const {
+    liked,
+    addedToCart,
     image,
+    category,
     index,
     originalPrice,
     discountPrice,
   } = product;
+  console.log(product);
   return (
     <>
       <Stack
         display="flex"
-        flexDirection="row"
-        justifyContent="space-between"
+        alignItems="center"
+        justifySelf="center"
         sx={{ height: "50px", width: "100%", backgroundColor: "lightblue" }}
       >
-        <Grid 
-          display="flex"
-          alignItems="center"
-          justifySelf="center"
-          position="relative"
-          left="35%"
-        >
         <Typography variant="h4">Vinayaka Jewellery Works</Typography>
-        </Grid>
-        <Grid
-          display="flex"
-          justifyContent="end"
-        >
-          <Button onClick={()=>navigate("/")}>Home</Button>
-        </Grid>
       </Stack>
       <Grid
         display="flex"
@@ -71,9 +54,9 @@ const IndividualProduct = () => {
         />
         <Stack display="flex" flexDirection="column" m="10px" gap="20px">
           <h3>
-            <del>
+            <span style={{ textDecoration: "line-through" }}>
               ₹{originalPrice}
-            </del>{" "}
+            </span>{" "}
             ₹{discountPrice}
           </h3>
           <Button

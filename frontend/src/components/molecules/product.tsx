@@ -1,16 +1,14 @@
-import { Button, Grid, IconButton, Stack } from "@mui/material";
+import {
+  Button,
+  Grid,
+  IconButton,
+  SelectChangeEvent,
+  Stack,
+} from "@mui/material";
 import React, { useState } from "react";
 import Icon from "../atoms/Icon";
+import ImageList from "../../gallery.json";
 import { useNavigate } from "react-router-dom";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useDispatch } from "react-redux";
-import {
-  removeSelectedProducts,
-  removeSelectedWishlist,
-  selectProducts,
-  selectWishlist,
-} from "../../redux/actions/ProductActions";
-import { toast } from "sonner";
 
 interface ProductProps {
   index: string;
@@ -21,8 +19,6 @@ interface ProductProps {
   handleItemAddedToCart?: (id: string) => void;
   originalPrice: string;
   discountPrice: string;
-  wishlisted?: boolean;
-  addedToCart?: boolean;
 }
 
 const Product = ({
@@ -34,49 +30,23 @@ const Product = ({
   handleItemAddedToCart,
   discountPrice,
   originalPrice,
-  wishlisted,
-  addedToCart,
 }: ProductProps) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
+  const [value, setValue] = useState<string>("1");
   const [liked, setLiked] = useState<boolean>(false);
-  const [hovered, setHovered] = useState(false);
-
-  const handleMouseEnter = () => {
-    setHovered(true);
+  const handleChange = (event: SelectChangeEvent) => {
+    setValue(event.target.value);
   };
-
-  const handleMouseLeave = () => {
-    setHovered(false);
-  };
-
+  console.log("original price is " + originalPrice);
   const handleLike = (id: string) => {
     setLiked((value) => !value);
+    console.log("id in product page is" + id);
     handleWishList?.(id);
-    toast.success("Item added to wishlist", { duration: 1000 });
-    dispatch(selectWishlist(id));
   };
 
   const handleParticularProduct = (id: string) => {
+    console.log("clicked a particular product");
     navigate(`product/${id}`);
-  };
-
-  const handleAddToCart = (id: string) => {
-    handleItemAddedToCart?.(id);
-    toast.success("Item added to Cart", { duration: 1000 });
-    dispatch(selectProducts(id));
-  };
-
-  const handleDelete = (id: string) => {
-    const currentPath = window.location.pathname;
-    if (currentPath.match("/wishlist")) {
-      toast.info("Item removed from wishlist", { duration: 1000 });
-      dispatch(removeSelectedWishlist(id));
-    } else if (currentPath.match("/cart")) {
-      toast.info("Item removed from cart", { duration: 1000 });
-      dispatch(removeSelectedProducts(id));
-    }
   };
 
   return (
@@ -85,17 +55,7 @@ const Product = ({
       flexDirection="column"
       width="300px"
       alignItems="center"
-      margin="20px 30px"
-      sx={{
-        "&:hover": {
-          backgroundColor: "#FEF3E2",
-          transform: "scale(1.05)",
-          border: "2px solid black",
-          padding: "10px",
-        },
-      }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      marginBottom="30px"
     >
       <Icon
         key={index}
@@ -112,50 +72,34 @@ const Product = ({
         alignItems="center"
       >
         <h3>
-          <del>₹{originalPrice}</del> ₹{discountPrice}
+          <span style={{ textDecoration: "line-through" }}>
+            ₹{originalPrice}
+          </span>{" "}
+          ₹{discountPrice}
         </h3>
-        {!wishlisted && (
-          <IconButton
-            style={{ height: "40px", width: "40px" }}
-            onClick={() => handleLike(index)}
-            sx={{ alignContent: "center" }}
-          >
-            {liked ? (
-              <Icon
-                key={index}
-                src="./images/liked.png"
-                alt="not-liked"
-                style={{ height: "30px", width: "30px" }}
-              />
-            ) : (
-              <Icon
-                key={index}
-                src="./images/normal.png"
-                alt="not-liked"
-                style={{ height: "30px", width: "30px" }}
-              />
-            )}
-          </IconButton>
-        )}
-        {(wishlisted || addedToCart) && (
-          <IconButton onClick={() => handleDelete(index)}>
-            <DeleteIcon />
-          </IconButton>
-        )}
-      </Stack>
-      {!addedToCart && hovered && (
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "#FF9F00",
-            "&:hover": { backgroundColor: "#FF9F00" },
-            width: "150px",
-          }}
-          onClick={() => handleAddToCart(index)}
+
+        <IconButton
+          style={{ height: "40px", width: "40px" }}
+          onClick={() => handleLike(index)}
+          sx={{ alignContent: "center" }}
         >
-          Add to Cart
-        </Button>
-      )}
+          {liked ? (
+            <Icon
+              key={index}
+              src="./images/liked.png"
+              alt="not-liked"
+              style={{ height: "40px", width: "40px" }}
+            />
+          ) : (
+            <Icon
+              key={index}
+              src="./images/normal.png"
+              alt="not-liked"
+              style={{ height: "40px", width: "40px" }}
+            />
+          )}
+        </IconButton>
+      </Stack>
     </Grid>
   );
 };
