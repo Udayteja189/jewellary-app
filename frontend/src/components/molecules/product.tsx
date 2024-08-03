@@ -1,13 +1,6 @@
-import {
-  Button,
-  Grid,
-  IconButton,
-  SelectChangeEvent,
-  Stack,
-} from "@mui/material";
+import { Button, Grid, IconButton, Stack } from "@mui/material";
 import React, { useState } from "react";
 import Icon from "../atoms/Icon";
-import ImageList from "../../gallery.json";
 import { useNavigate } from "react-router-dom";
 
 interface ProductProps {
@@ -19,6 +12,8 @@ interface ProductProps {
   handleItemAddedToCart?: (id: string) => void;
   originalPrice: string;
   discountPrice: string;
+  wishlisted?: boolean;
+  addedToCart?: boolean;
 }
 
 const Product = ({
@@ -30,14 +25,24 @@ const Product = ({
   handleItemAddedToCart,
   discountPrice,
   originalPrice,
+  wishlisted,
+  addedToCart,
 }: ProductProps) => {
+
   const navigate = useNavigate();
-  const [value, setValue] = useState<string>("1");
   const [liked, setLiked] = useState<boolean>(false);
-  const handleChange = (event: SelectChangeEvent) => {
-    setValue(event.target.value);
+  const [hovered, setHovered] = useState(false);
+
+  const handleMouseEnter = () => {
+    setHovered(true);
   };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+  };
+
   console.log("original price is " + originalPrice);
+
   const handleLike = (id: string) => {
     setLiked((value) => !value);
     console.log("id in product page is" + id);
@@ -55,7 +60,17 @@ const Product = ({
       flexDirection="column"
       width="300px"
       alignItems="center"
-      marginBottom="30px"
+      margin="20px 30px"
+      sx={{
+        "&:hover": {
+          backgroundColor: "#FEF3E2",
+          transform: "scale(1.05)",
+          border: "2px solid black",
+          padding:"10px"
+        },
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <Icon
         key={index}
@@ -77,29 +92,43 @@ const Product = ({
           </span>{" "}
           ₹{discountPrice}
         </h3>
-
-        <IconButton
-          style={{ height: "40px", width: "40px" }}
-          onClick={() => handleLike(index)}
-          sx={{ alignContent: "center" }}
-        >
-          {liked ? (
-            <Icon
-              key={index}
-              src="./images/liked.png"
-              alt="not-liked"
-              style={{ height: "40px", width: "40px" }}
-            />
-          ) : (
-            <Icon
-              key={index}
-              src="./images/normal.png"
-              alt="not-liked"
-              style={{ height: "40px", width: "40px" }}
-            />
-          )}
-        </IconButton>
+        {!wishlisted && (
+          <IconButton
+            style={{ height: "40px", width: "40px" }}
+            onClick={() => handleLike(index)}
+            sx={{ alignContent: "center" }}
+          >
+            {liked ? (
+              <Icon
+                key={index}
+                src="./images/liked.png"
+                alt="not-liked"
+                style={{ height: "30px", width: "30px" }}
+              />
+            ) : (
+              <Icon
+                key={index}
+                src="./images/normal.png"
+                alt="not-liked"
+                style={{ height: "30px", width: "30px" }}
+              />
+            )}
+          </IconButton>
+        )}
       </Stack>
+      { !addedToCart && hovered &&
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: "#FF9F00",
+            "&:hover": { backgroundColor: "#FF9F00" },
+            width: "150px",
+          }}
+          onClick={() => handleItemAddedToCart?.(index)}
+        >
+          Add to Cart
+        </Button>
+      }
     </Grid>
   );
 };

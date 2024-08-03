@@ -23,14 +23,14 @@ export const removeSelectedProducts = (id) =>{
 
 export const selectWishlist = (id) =>{
     return {
-        type: ActionTypes.ADD_PRODUCT_TO_CART,
+        type: ActionTypes.ADD_PRODUCT_TO_WISHLIST,
         payload: id
     }
 }
 
 export const removeSelectedWishlist = (id) =>{
     return {
-        type: ActionTypes.REMOVE_PRODUCT_FROM_CART,
+        type: ActionTypes.REMOVE_PRODUCT_FROM_WISHLIST,
         payload: id
     }
 }
