@@ -1,23 +1,39 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "./Home";
-import Product from "./molecules/product";
-import { Stack, Typography } from "@mui/material";
+import Product from "../molecules/product";
+import { Button, Grid, Stack, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const products = useSelector(
     (state: RootState) => state.allProducts.products
   );
-  //   console.log(products);
+
+  const navigate = useNavigate();
   return (
     <div>
       <Stack
         display="flex"
-        alignItems="center"
-        justifySelf="center"
+        flexDirection="row"
+        justifyContent="space-between"
         sx={{ height: "50px", width: "100%", backgroundColor: "lightblue" }}
       >
+        <Grid 
+          display="flex"
+          alignItems="center"
+          justifySelf="center"
+          position="relative"
+          left="35%"
+        >
         <Typography variant="h4">Vinayaka Jewellery Works</Typography>
+        </Grid>
+        <Grid
+          display="flex"
+          justifyContent="end"
+        >
+          <Button onClick={()=>navigate("/")}>Home</Button>
+        </Grid>
       </Stack>
       <Stack
         display="flex"
@@ -37,6 +53,7 @@ const Cart = () => {
               style={{ height: "200px" }}
               originalPrice={originalPrice}
               discountPrice={discountPrice}
+              addedToCart={p.addedToCart}
             />
           )
         );

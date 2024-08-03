@@ -1,6 +1,5 @@
 import {
   TextField,
-  Icon as MuiIcon,
   Stack,
   Grid,
   IconButton,
@@ -13,15 +12,14 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import Badge from "@mui/material/Badge";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import ImageList from "../gallery.json";
-import Icon from "./atoms/Icon";
-import Product from "./molecules/product";
+import Icon from "../atoms/Icon";
+import Product from "../molecules/product";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  removeSelectedProducts,
   selectProducts,
-} from "../redux/actions/ProductActions";
+  selectWishlist,
+} from "../../redux/actions/ProductActions";
 
 export interface ProductProps {
   index: string;
@@ -45,21 +43,11 @@ const Home = () => {
   const products = useSelector(
     (state: RootState) => state.allProducts.products
   );
-  // console.log(products);
+  
   const productsInCart = products.filter((p)=>p.addedToCart === true)
   console.log(productsInCart)
   const [value, setValue] = useState<number>(productsInCart.length);
   const [searchValue, setSearchValue] = useState<string>("");
-  const [imgList, setImgList] =
-    useState<
-      {
-        image: string;
-        index: string;
-        category: string;
-        liked: boolean;
-        addedToCart: boolean;
-      }[]
-    >(ImageList);
 
   const handleLogin = () => {
     console.log("Account icon clicked");
@@ -76,28 +64,26 @@ const Home = () => {
   };
 
   const handleWishList = (id: string) => {
-    console.log("id is " + id);
-    setImgList((prevImageList) =>
-      prevImageList.map((img) =>
-        img.index === id ? { ...img, liked: !img.liked } : img
-      )
-    );
+    console.log("wishlisted id is " + id);
+    dispatch(selectWishlist(id))
   };
 
   return (
     <div>
       <Grid
-        sx={{ height: "50px", width: "100%", backgroundColor: "lightblue" }}
+        sx={{ height: "80px", width: "100%", backgroundColor: "lightblue" }}
         display="flex"
         justifyContent="space-between"
         marginBottom="40px"
+        alignItems="center"
       >
         <Stack display="flex" alignItems="center"></Stack>
         <Stack display="flex" flexDirection="row">
           <Icon
             src="./images/ganeshLogo.png"
             alt="ganeshLogo"
-            style={{ height: "50px", width: "50px" }}
+            // to mix img-background withbackground color 
+            style={{ height: "50px", width: "50px",mixBlendMode:"multiply" }} 
           />
           <Typography variant="h4">Vinayaka Jewellery Works</Typography>
         </Stack>
@@ -133,7 +119,7 @@ const Home = () => {
             <IconButton onClick={() => navigate("/wishlist")}>
               <FavoriteBorderIcon sx={{ height: "30px", width: "30px" }} />
             </IconButton>
-            <IconButton onClick={handleCart}>
+            <IconButton onClick={handleCart} disableRipple>
               <Badge
                 badgeContent={value}
                 color="primary"
@@ -178,6 +164,7 @@ const Home = () => {
                   originalPrice={image.originalPrice}
                   discountPrice={image.discountPrice}
                   handleWishList={() => handleWishList(image.index)}
+                  handleItemAddedToCart={() => handleItemAddedToCart(image.index)}
                 />
               ))}
       </Stack>

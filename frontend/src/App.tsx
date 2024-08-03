@@ -1,11 +1,11 @@
 import React from "react";
 import "./App.css";
-import Login from "../src/components/Login";
-import Home from "./components/Home";
-import Signup from "./components/Signup";
+import Login from "./components/organisms/Login";
+import Home from "./components/organisms/Home";
+import Signup from "./components/organisms/Signup";
 import { Route, Routes } from "react-router-dom";
-import Wishlist from "./components/Wishlist";
-import Cart from "./components/Cart";
+import Wishlist from "./components/organisms/Wishlist";
+import Cart from "./components/organisms/Cart";
 import IndividualProduct from "./components/molecules/IndividualProduct";
 
 function App() {
