@@ -21,7 +21,6 @@ const IndividualProduct = () => {
   const product = products.filter((p) => p.index === param.id)[0];
 
   const handleItemAddedToCart = (id: string) => {
-    console.log("added to cart");
     dispatch(selectProducts(id));
   };
   const {
@@ -30,7 +29,6 @@ const IndividualProduct = () => {
     originalPrice,
     discountPrice,
   } = product;
-  console.log(product);
   return (
     <>
       <Stack

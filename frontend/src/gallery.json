@@ -79,5 +79,35 @@
         "addedToCart": false,
         "originalPrice": "1,20,000",
         "discountPrice": "1,06,350"
+    },
+    {
+        "index":"10",
+        "image":"https://www.lalithaajewellery.com/assets/img/bengali/10.jpg",
+        "category":"bangles",
+        "liked":false,
+        "addedToCart":false,
+        "originalPrice":"1,20,000",
+        "discountPrice":"1,06,350"
+
+    },
+    {
+        "index":"11",
+        "image":"https://www.lalithaajewellery.com/assets/img/bengali/11.jpg",
+        "category":"bangles",
+        "liked":false,
+        "addedToCart":false,
+        "originalPrice":"1,20,000",
+        "discountPrice":"1,06,350"
+
+    },
+    {
+        "index":"12",
+        "image":"https://www.lalithaajewellery.com/assets/img/bengali/12.jpg",
+        "category":"bangles",
+        "liked":false,
+        "addedToCart":false,
+        "originalPrice":"1,20,000",
+        "discountPrice":"1,06,350"
+
     }
 ]
