@@ -2,6 +2,9 @@ import { Button, Grid, IconButton, Stack } from "@mui/material";
 import React, { useState } from "react";
 import Icon from "../atoms/Icon";
 import { useNavigate } from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useDispatch } from "react-redux";
+import { removeSelectedProducts, removeSelectedWishlist, selectWishlist } from "../../redux/actions/ProductActions";
 
 interface ProductProps {
   index: string;
@@ -28,8 +31,9 @@ const Product = ({
   wishlisted,
   addedToCart,
 }: ProductProps) => {
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [liked, setLiked] = useState<boolean>(false);
   const [hovered, setHovered] = useState(false);
 
@@ -41,18 +45,26 @@ const Product = ({
     setHovered(false);
   };
 
-  console.log("original price is " + originalPrice);
-
   const handleLike = (id: string) => {
     setLiked((value) => !value);
-    console.log("id in product page is" + id);
     handleWishList?.(id);
+    dispatch(selectWishlist(id));
   };
 
   const handleParticularProduct = (id: string) => {
-    console.log("clicked a particular product");
     navigate(`product/${id}`);
   };
+
+  const handleDelete = (id:string) => {
+     const currentPath = window.location.pathname;
+     console.log(currentPath)
+     if(currentPath.match("/wishlist")){
+        dispatch(removeSelectedWishlist(id))
+     }else if(currentPath.match("/cart")){
+        dispatch(removeSelectedProducts(id))
+     }
+  }
+
 
   return (
     <Grid
@@ -66,7 +78,7 @@ const Product = ({
           backgroundColor: "#FEF3E2",
           transform: "scale(1.05)",
           border: "2px solid black",
-          padding:"10px"
+          padding: "10px",
         },
       }}
       onMouseEnter={handleMouseEnter}
@@ -115,8 +127,15 @@ const Product = ({
             )}
           </IconButton>
         )}
+        {
+          (wishlisted || addedToCart) && (
+            <IconButton onClick={() => handleDelete(index)}>
+              <DeleteIcon />
+            </IconButton>
+          )
+        }
       </Stack>
-      { !addedToCart && hovered &&
+      {!addedToCart && hovered && (
         <Button
           variant="contained"
           sx={{
@@ -128,7 +147,7 @@ const Product = ({
         >
           Add to Cart
         </Button>
-      }
+      )}
     </Grid>
   );
 };
