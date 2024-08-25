@@ -5,6 +5,7 @@ import { RootState } from "../organisms/Home";
 import { Grid, Stack, Button, Typography } from "@mui/material";
 import Icon from "../atoms/Icon";
 import { selectProducts } from "../../redux/actions/ProductActions";
+import { toast } from "sonner";
 
 const IndividualProduct = () => {
 
@@ -21,6 +22,7 @@ const IndividualProduct = () => {
   const product = products.filter((p) => p.index === param.id)[0];
 
   const handleItemAddedToCart = (id: string) => {
+    toast.success("Item added to cart",{duration:1000})
     dispatch(selectProducts(id));
   };
   const {
@@ -69,9 +71,9 @@ const IndividualProduct = () => {
         />
         <Stack display="flex" flexDirection="column" m="10px" gap="20px">
           <h3>
-            <span style={{ textDecoration: "line-through" }}>
+            <del>
               ₹{originalPrice}
-            </span>{" "}
+            </del>{" "}
             ₹{discountPrice}
           </h3>
           <Button

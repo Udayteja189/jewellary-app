@@ -1,10 +1,9 @@
 import { Button, Grid, Stack, styled, Typography, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import { RootState } from "./Home";
 import Product from "../molecules/product";
 import { useNavigate } from "react-router-dom";
-import { selectProducts, selectWishlist } from "../../redux/actions/ProductActions";
 
 const ResponsiveIcon = styled("img")(({ theme }) => ({
   height: "50px",
@@ -27,18 +26,12 @@ const ResponsiveTypography = styled(Typography)(({ theme }) => ({
 const Wishlist = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const dispatch = useDispatch();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const products = useSelector(
     (state: RootState) => state.allProducts.products
   );
-  console.log("products in wishlisted");
-  console.log(products);
 
-  const handleAddToCart = (id: string) => {
-    dispatch(selectProducts(id));
-  };
 
   return (
     <>
@@ -89,7 +82,6 @@ const Wishlist = () => {
                 originalPrice={originalPrice}
                 discountPrice={discountPrice}
                 wishlisted={liked}
-                handleItemAddedToCart={()=>handleAddToCart(index)}
               />
             )
           );
