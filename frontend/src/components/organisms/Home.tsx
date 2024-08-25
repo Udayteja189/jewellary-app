@@ -17,15 +17,10 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import Badge from "@mui/material/Badge";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import Icon from "../atoms/Icon";
 import Product from "../molecules/product";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import MenuIcon from "@mui/icons-material/Menu";
-import {
-  selectProducts,
-  selectWishlist,
-} from "../../redux/actions/ProductActions";
 
 export interface ProductProps {
   index: string;
@@ -74,7 +69,6 @@ const ResponsiveTypography = styled(Typography)(({ theme }) => ({
 const Home = () => {
   const theme = useTheme();
   const isMediumUp = useMediaQuery(theme.breakpoints.up("md"));
-  const isSmallUp = useMediaQuery(theme.breakpoints.up("sm"));
   const [isMediumOrSmaller, setIsMediumOrSmaller] = useState(false);
 
   const pages = ["Wishlists", "My Cart", "Account"];
@@ -95,16 +89,13 @@ const Home = () => {
   };
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const products = useSelector(
     (state: RootState) => state.allProducts.products
   );
-  
-  const handleItemAddedToCart = (id: string) => {
-    dispatch(selectProducts(id));
-  };
+
 
   const [value, setValue] = useState<number>(0);
+  const [wishlistedCount,setWishlistedCount] = useState<number>(0);
   const [searchValue, setSearchValue] = useState<string>("");
 
   const handleLogin = () => {
@@ -117,14 +108,11 @@ const Home = () => {
 
   useEffect(() => {
     const productsInCart = products.filter((p) => p.addedToCart === true);
+    const productsInWishlist = products.filter((p) => p.liked === true);
+    setWishlistedCount(productsInWishlist.length);
     setValue(productsInCart.length);
   }, [products])
 
-
-  const handleWishList = (id: string) => {
-    console.log("wishlisted id is " + id);
-    dispatch(selectWishlist(id));
-  };
 
   const handleMenuItems = (key: string) => {
     switch (
@@ -240,13 +228,17 @@ const Home = () => {
                   <AccountCircle sx={{ height: "30px", width: "30px" }} />
                 </IconButton>
                 <IconButton onClick={() => navigate("/wishlist")}>
+                <Badge
+                    badgeContent={wishlistedCount}
+                    color="primary"
+                  >
                   <FavoriteBorderIcon sx={{ height: "30px", width: "30px" }} />
+                  </Badge>
                 </IconButton>
                 <IconButton onClick={handleCart} disableRipple>
                   <Badge
                     badgeContent={value}
                     color="primary"
-                    sx={{ m: "0 20px 0 0px" }}
                   >
                     <ShoppingCartIcon sx={{ height: "30px", width: "30px" }} />
                   </Badge>
@@ -274,8 +266,6 @@ const Home = () => {
                 style={{ height: "200px" }}
                 originalPrice={image.originalPrice}
                 discountPrice={image.discountPrice}
-                handleWishList={() => handleWishList(image.index)}
-                handleItemAddedToCart={() => handleItemAddedToCart(image.index)}
               />
             ))
           : products
@@ -289,10 +279,6 @@ const Home = () => {
                   style={{ height: "200px" }}
                   originalPrice={image.originalPrice}
                   discountPrice={image.discountPrice}
-                  handleWishList={() => handleWishList(image.index)}
-                  handleItemAddedToCart={() =>
-                    handleItemAddedToCart(image.index)
-                  }
                 />
               ))}
       </Stack>

@@ -4,7 +4,13 @@ import Icon from "../atoms/Icon";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useDispatch } from "react-redux";
-import { removeSelectedProducts, removeSelectedWishlist, selectWishlist } from "../../redux/actions/ProductActions";
+import {
+  removeSelectedProducts,
+  removeSelectedWishlist,
+  selectProducts,
+  selectWishlist,
+} from "../../redux/actions/ProductActions";
+import { toast } from "sonner";
 
 interface ProductProps {
   index: string;
@@ -48,6 +54,7 @@ const Product = ({
   const handleLike = (id: string) => {
     setLiked((value) => !value);
     handleWishList?.(id);
+    toast.success("Item added to wishlist", { duration: 1000 });
     dispatch(selectWishlist(id));
   };
 
@@ -55,16 +62,22 @@ const Product = ({
     navigate(`product/${id}`);
   };
 
-  const handleDelete = (id:string) => {
-     const currentPath = window.location.pathname;
-     console.log(currentPath)
-     if(currentPath.match("/wishlist")){
-        dispatch(removeSelectedWishlist(id))
-     }else if(currentPath.match("/cart")){
-        dispatch(removeSelectedProducts(id))
-     }
-  }
+  const handleAddToCart = (id: string) => {
+    handleItemAddedToCart?.(id);
+    toast.success("Item added to Cart", { duration: 1000 });
+    dispatch(selectProducts(id));
+  };
 
+  const handleDelete = (id: string) => {
+    const currentPath = window.location.pathname;
+    if (currentPath.match("/wishlist")) {
+      toast.info("Item removed from wishlist", { duration: 1000 });
+      dispatch(removeSelectedWishlist(id));
+    } else if (currentPath.match("/cart")) {
+      toast.info("Item removed from cart", { duration: 1000 });
+      dispatch(removeSelectedProducts(id));
+    }
+  };
 
   return (
     <Grid
@@ -99,10 +112,7 @@ const Product = ({
         alignItems="center"
       >
         <h3>
-          <span style={{ textDecoration: "line-through" }}>
-            ₹{originalPrice}
-          </span>{" "}
-          ₹{discountPrice}
+          <del>₹{originalPrice}</del> ₹{discountPrice}
         </h3>
         {!wishlisted && (
           <IconButton
@@ -127,13 +137,11 @@ const Product = ({
             )}
           </IconButton>
         )}
-        {
-          (wishlisted || addedToCart) && (
-            <IconButton onClick={() => handleDelete(index)}>
-              <DeleteIcon />
-            </IconButton>
-          )
-        }
+        {(wishlisted || addedToCart) && (
+          <IconButton onClick={() => handleDelete(index)}>
+            <DeleteIcon />
+          </IconButton>
+        )}
       </Stack>
       {!addedToCart && hovered && (
         <Button
@@ -143,7 +151,7 @@ const Product = ({
             "&:hover": { backgroundColor: "#FF9F00" },
             width: "150px",
           }}
-          onClick={() => handleItemAddedToCart?.(index)}
+          onClick={() => handleAddToCart(index)}
         >
           Add to Cart
         </Button>
