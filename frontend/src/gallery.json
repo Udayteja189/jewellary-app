@@ -1,0 +1,113 @@
+[   
+    {
+        "index":"1",
+        "image": "https://www.lalithaajewellery.com/assets/img/jhumukki/1.webp",
+        "category": "earring",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "60,000",
+        "discountPrice": "56,780"
+    },
+    {
+        "index":"2",
+        "image": "https://www.lalithaajewellery.com/assets/img/jhumukki/2.webp",
+        "category": "earring",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "60,000",
+        "discountPrice": "56,780"
+    },
+    {
+        "index":"3",
+        "image": "https://www.lalithaajewellery.com/assets/img/jhumukki/3.webp",
+        "category": "earring",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "60,000",
+        "discountPrice": "56,780"
+    },
+    {
+        "index":"4",
+        "image": "https://www.lalithaajewellery.com/assets/img/jhumukki/5.webp",
+        "category": "earring",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "60,000",
+        "discountPrice": "56,780"
+    },
+    {
+        "index":"5",
+        "image": "https://www.lalithaajewellery.com/assets/img/jhumukki/5.webp",
+        "category": "earring",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "60,000",
+        "discountPrice": "56,780"
+    },
+    {
+        "index":"6",
+        "image": "https://www.lalithaajewellery.com/assets/img/necklace/1.webp",
+        "category":"necklace",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "1,20,000",
+        "discountPrice": "1,06,350"
+    },
+    {
+        "index":"7",
+        "image": "https://www.lalithaajewellery.com/assets/img/necklace/2.webp",
+        "category":"necklace",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "1,20,000",
+        "discountPrice": "1,06,350"
+    },
+    {
+        "index":"8",
+        "image":"https://www.lalithaajewellery.com/assets/img/necklace/10.webp",
+        "category":"necklace",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "1,20,000",
+        "discountPrice": "1,06,350"
+    },
+    {
+        "index":"9",
+        "image":"https://www.lalithaajewellery.com/assets/img/necklace/5.webp",
+        "category":"necklace",
+        "liked": false,
+        "addedToCart": false,
+        "originalPrice": "1,20,000",
+        "discountPrice": "1,06,350"
+    },
+    {
+        "index":"10",
+        "image":"https://www.lalithaajewellery.com/assets/img/bengali/10.jpg",
+        "category":"bangles",
+        "liked":false,
+        "addedToCart":false,
+        "originalPrice":"1,20,000",
+        "discountPrice":"1,06,350"
+
+    },
+    {
+        "index":"11",
+        "image":"https://www.lalithaajewellery.com/assets/img/bengali/11.jpg",
+        "category":"bangles",
+        "liked":false,
+        "addedToCart":false,
+        "originalPrice":"1,20,000",
+        "discountPrice":"1,06,350"
+
+    },
+    {
+        "index":"12",
+        "image":"https://www.lalithaajewellery.com/assets/img/bengali/12.jpg",
+        "category":"bangles",
+        "liked":false,
+        "addedToCart":false,
+        "originalPrice":"1,20,000",
+        "discountPrice":"1,06,350"
+
+    }
+]
