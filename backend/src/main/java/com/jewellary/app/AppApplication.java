@@ -2,8 +2,10 @@ package com.jewellary.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.jewellary.app")
+@EnableJpaRepositories(basePackages = "com.jewellary.app.repository")
 public class AppApplication {
 
 	public static void main(String[] args) {

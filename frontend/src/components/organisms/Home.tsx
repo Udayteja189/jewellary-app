@@ -10,7 +10,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -21,6 +21,7 @@ import Product from "../molecules/product";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useDropzone } from "react-dropzone";
 
 export interface ProductProps {
   index: string;
@@ -71,6 +72,13 @@ const Home = () => {
   const isMediumUp = useMediaQuery(theme.breakpoints.up("md"));
   const [isMediumOrSmaller, setIsMediumOrSmaller] = useState(false);
 
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    // handle dropped files
+    console.log(acceptedFiles);
+  }, []);
+
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
+
   const pages = ["Wishlists", "My Cart", "Account"];
 
   const [anchorElNav, setAnchorElNav] =
@@ -93,17 +101,24 @@ const Home = () => {
     (state: RootState) => state.allProducts.products
   );
 
-
   const [value, setValue] = useState<number>(0);
-  const [wishlistedCount,setWishlistedCount] = useState<number>(0);
+  const [wishlistedCount, setWishlistedCount] = useState<number>(0);
   const [searchValue, setSearchValue] = useState<string>("");
 
-  const handleLogin = () => {
+  const handleProfileImg = () => {
+    // <div {...getRootProps()}>
+    //     <input {...getInputProps()} />
+    //     {
+    //       isDragActive ?
+    //         <p>Drop the files here ...</p> :
+    //         <button>Drag 'n' drop some files here, or click to select files </button>
+    //     }
+    //   </div>
     console.log("Account icon clicked");
   };
 
   const handleCart = () => {
-    navigate("cart");
+    navigate("/cart");
   };
 
   useEffect(() => {
@@ -111,8 +126,7 @@ const Home = () => {
     const productsInWishlist = products.filter((p) => p.liked === true);
     setWishlistedCount(productsInWishlist.length);
     setValue(productsInCart.length);
-  }, [products])
-
+  }, [products]);
 
   const handleMenuItems = (key: string) => {
     switch (
@@ -213,8 +227,7 @@ const Home = () => {
                       position="start"
                       sx={{ marginTop: "0px", p: "0" }}
                     >
-                      <IconButton
-                      >
+                      <IconButton>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
@@ -224,28 +237,26 @@ const Home = () => {
                 onChange={(e) => setSearchValue(e.target.value)}
               />
               <Grid display="flex" alignItems="center" gap="20px">
-                <IconButton onClick={handleLogin}>
+                <IconButton onClick={handleProfileImg}>
                   <AccountCircle sx={{ height: "30px", width: "30px" }} />
                 </IconButton>
                 <IconButton onClick={() => navigate("/wishlist")}>
-                <Badge
-                    badgeContent={wishlistedCount}
-                    color="primary"
-                  >
-                  <FavoriteBorderIcon sx={{ height: "30px", width: "30px" }} />
+                  <Badge badgeContent={wishlistedCount} color="primary">
+                    <FavoriteBorderIcon
+                      sx={{ height: "30px", width: "30px" }}
+                    />
                   </Badge>
                 </IconButton>
                 <IconButton onClick={handleCart} disableRipple>
-                  <Badge
-                    badgeContent={value}
-                    color="primary"
-                  >
+                  <Badge badgeContent={value} color="primary">
                     <ShoppingCartIcon sx={{ height: "30px", width: "30px" }} />
                   </Badge>
                 </IconButton>
               </Grid>
             </Stack>
-          ) : <Stack/>}
+          ) : (
+            <Stack />
+          )}
         </>
       </StyledNavGrid>
       <Stack
@@ -266,6 +277,8 @@ const Home = () => {
                 style={{ height: "200px" }}
                 originalPrice={image.originalPrice}
                 discountPrice={image.discountPrice}
+                // wishlisted={image.liked}
+                // addedToCart={image.addedToCart}
               />
             ))
           : products
@@ -279,6 +292,8 @@ const Home = () => {
                   style={{ height: "200px" }}
                   originalPrice={image.originalPrice}
                   discountPrice={image.discountPrice}
+                  // wishlisted={image.liked}
+                  // addedToCart={image.addedToCart}
                 />
               ))}
       </Stack>

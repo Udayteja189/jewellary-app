@@ -71,7 +71,7 @@ const Cart = () => {
           display="flex"
           justifyContent={isSmallScreen ? "center" : "flex-end"}
         >
-          <Button onClick={() => navigate("/")}>Home</Button>
+          <Button onClick={() => navigate("/home")}>Home</Button>
         </Grid>
       </Stack>
       <Stack

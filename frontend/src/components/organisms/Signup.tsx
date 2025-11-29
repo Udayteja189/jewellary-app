@@ -1,13 +1,8 @@
 import React from 'react'
-import AccountCircle from '@mui/icons-material/AccountCircle';
+import AuthForm from '../molecules/AuthForm'
 
-const Signup = () => {
-  return (
-    <div>
-      This is a Signup page
-      {/* <AccountCircle /> */}
-    </div>
-  )
+const Signup: React.FC = () => {
+  return <AuthForm mode="signup" />
 }
 
 export default Signup

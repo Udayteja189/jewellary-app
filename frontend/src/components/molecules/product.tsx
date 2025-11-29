@@ -54,12 +54,12 @@ const Product = ({
   const handleLike = (id: string) => {
     setLiked((value) => !value);
     handleWishList?.(id);
-    toast.success("Item added to wishlist", { duration: 1000 });
     dispatch(selectWishlist(id));
+      toast.success("Item added to wishlist", { duration: 1000 });
   };
 
   const handleParticularProduct = (id: string) => {
-    navigate(`product/${id}`);
+    navigate(`/product/${id}`);
   };
 
   const handleAddToCart = (id: string) => {
