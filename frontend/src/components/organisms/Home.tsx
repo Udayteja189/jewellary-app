@@ -10,34 +10,24 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Badge from "@mui/material/Badge";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import Product from "../molecules/product";
+import Product from "../molecules/Products";
+import { Product as ProductType } from "../../types/Product";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { addToWishlist, setProducts, setProductsInCart, setWishListed } from "../../redux/actions/ProductActions";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useDropzone } from "react-dropzone";
-
-export interface ProductProps {
-  index: string;
-  image: string;
-  category: string;
-  liked: boolean;
-  addedToCart: boolean;
-  originalPrice: string;
-  discountPrice: string;
-}
-
-export interface RootState {
-  allProducts: {
-    products: ProductProps[];
-  };
-}
+import { useAppSelector } from "../../types/hooks";
+import { RootState } from "../../redux/store";
+import { WishlistItems } from "../../types/wishlist";
+import { CartItems } from "../../types/cart";
+// import { useDropzone } from "react-dropzone"; // removed (not used)
 
 const StyledNavGrid = styled(Grid)(({ theme }) => ({
   height: "80px",
@@ -72,12 +62,12 @@ const Home = () => {
   const isMediumUp = useMediaQuery(theme.breakpoints.up("md"));
   const [isMediumOrSmaller, setIsMediumOrSmaller] = useState(false);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    // handle dropped files
-    console.log(acceptedFiles);
-  }, []);
+  // const onDrop = useCallback((acceptedFiles: File[]) => {
+  //   // handle dropped files (unused in header)
+  //   console.log(acceptedFiles);
+  // }, []);
 
-  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
+  // const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
 
   const pages = ["Wishlists", "My Cart", "Account"];
 
@@ -101,8 +91,89 @@ const Home = () => {
     (state: RootState) => state.allProducts.products
   );
 
-  const [value, setValue] = useState<number>(0);
-  const [wishlistedCount, setWishlistedCount] = useState<number>(0);
+  const wishlistedProducts = useSelector(
+    (state: RootState) => state.wishlistProducts.products
+  );
+
+  const productsInCart = useSelector(
+    (state: RootState) => state.cartProducts.products
+  );
+
+  const dispatch = useDispatch();
+  const productsCount = products ? products.length : 0;
+
+  const {user:username,token: userAuthToken} = useAppSelector((state) => state.auth);
+
+  const fetchJson = async (url: string, options?: RequestInit) => {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.json();
+  };
+
+  const loadProducts = async () => {
+  const data = await fetchJson("http://localhost:8080/v1/products");
+  dispatch(setProducts(data));
+};
+
+const loadWishlist = async () => {
+  const data: WishlistItems[] = await fetchJson(
+    `http://localhost:8080/v1/products/wishlisted?username=${username}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userAuthToken}`,
+      },
+    }
+  );
+
+  const productsOnly = data.map(item => item.product);
+
+  dispatch(setWishListed(productsOnly));
+};
+
+const loadCart = async () => {
+  const data:CartItems[] = await fetchJson(
+    `http://localhost:8080/v1/products/cart?username=${username}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userAuthToken}`,
+      },
+    }
+  );
+
+  const productsOnly = data.map(item => item.product);
+  dispatch(setProductsInCart(productsOnly));
+};
+
+
+
+  // load products from API on mount and populate redux store
+  useEffect(() => {
+  if (productsCount > 0) {
+    console.debug("Products already in store — skipping API fetch");
+    return;
+  }
+
+  const init = async () => {
+    try {
+      await Promise.all([
+        loadProducts(),
+        loadWishlist(),
+        loadCart(),
+      ]);
+    } catch (error) {
+      console.error("Failed to initialize data", error);
+    }
+  };
+  console.log("Redux cart updated:", productsInCart);
+
+  init();
+}, [productsCount, loadCart, loadWishlist, dispatch, productsInCart]);
+
+
   const [searchValue, setSearchValue] = useState<string>("");
 
   const handleProfileImg = () => {
@@ -121,22 +192,15 @@ const Home = () => {
     navigate("/cart");
   };
 
-  useEffect(() => {
-    const productsInCart = products.filter((p) => p.addedToCart === true);
-    const productsInWishlist = products.filter((p) => p.liked === true);
-    setWishlistedCount(productsInWishlist.length);
-    setValue(productsInCart.length);
-  }, [products]);
-
   const handleMenuItems = (key: string) => {
     switch (
       key //Wishlists", "My Cart", "Account
     ) {
       case "Wishlists":
-        navigate("wishlist");
+        navigate("/wishlist");
         break;
       case "My Cart":
-        navigate("cart");
+        navigate("/cart");
         break;
       case "Account":
         console.log("Account menu items clicked");
@@ -153,6 +217,7 @@ const Home = () => {
             alignItems="center"
             justifyContent="center"
             m="0 5vh"
+            key="Company-Logo-Name"
           >
             {isMediumOrSmaller && (
               <>
@@ -195,7 +260,7 @@ const Home = () => {
               </>
             )}
           </Stack>
-          <Stack display="flex" flexDirection="row">
+          <Stack display="flex" flexDirection="row" key="right-nav-items">
             <ResponsiveIcon
               src="./images/ganeshLogo.png"
               alt="ganeshLogo"
@@ -241,14 +306,14 @@ const Home = () => {
                   <AccountCircle sx={{ height: "30px", width: "30px" }} />
                 </IconButton>
                 <IconButton onClick={() => navigate("/wishlist")}>
-                  <Badge badgeContent={wishlistedCount} color="primary">
+                  <Badge badgeContent={wishlistedProducts.length} color="primary">
                     <FavoriteBorderIcon
                       sx={{ height: "30px", width: "30px" }}
                     />
                   </Badge>
                 </IconButton>
                 <IconButton onClick={handleCart} disableRipple>
-                  <Badge badgeContent={value} color="primary">
+                  <Badge badgeContent={productsInCart.length} color="primary">
                     <ShoppingCartIcon sx={{ height: "30px", width: "30px" }} />
                   </Badge>
                 </IconButton>
@@ -268,34 +333,31 @@ const Home = () => {
         justifyContent="center"
       >
         {searchValue === ""
-          ? products.map((image) => (
-              <Product
-                key={image.index}
-                index={image.index}
-                src={image.image}
-                alt={`Image ${image.index}`}
-                style={{ height: "200px" }}
-                originalPrice={image.originalPrice}
-                discountPrice={image.discountPrice}
-                // wishlisted={image.liked}
-                // addedToCart={image.addedToCart}
-              />
-            ))
-          : products
-              .filter((img) => img.category.includes(searchValue))
-              .map((image) => (
+          ? products.map((p:ProductType) => (
                 <Product
-                  key={image.index}
-                  index={image.index}
-                  src={image.image}
-                  alt={`Image ${image.index}`}
+                  key={p.id}
+                  index={p.id}
+                  image={p.image}
+                  alt={`Image ${p.id}`}
                   style={{ height: "200px" }}
-                  originalPrice={image.originalPrice}
-                  discountPrice={image.discountPrice}
-                  // wishlisted={image.liked}
-                  // addedToCart={image.addedToCart}
+                  originalPrice={p.originalPrice}
+                  discountPrice={p.discountPrice}
+                  name={p.name}
                 />
-              ))}
+              ))
+          : products
+                .filter((img: { category: string}) => img.category.includes(searchValue))
+                .map((p: ProductType) => (
+                  <Product
+                    key={p.id}
+                    index={p.id}
+                    image={p.image}
+                    alt={`Image ${p.id}`}
+                    style={{ height: "200px" }}
+                    originalPrice={p.originalPrice}
+                    discountPrice={p.discountPrice}
+                  />
+                ))}
       </Stack>
     </div>
   );

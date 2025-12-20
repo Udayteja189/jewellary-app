@@ -18,11 +18,11 @@ public interface ProductRepository extends JpaRepository<Product,Integer> {
     @Query("SELECT p FROM Product p WHERE p.category = :category")
     List<Product> getProductsByCategory(@Param("category") String category);
 
-    @Query("select p from Product p where p.isWishlisted = true")
-    List<Product> getWishlistedProducts();
-
-    @Query("SELECT p FROM Product p WHERE p.isAddedToCart = true")
-    List<Product> getProductsInCart();
+//    @Query("select p from Product p where p.isWishlisted = true")
+//    List<Product> getWishlistedProducts();
+//
+//    @Query("SELECT p FROM Product p WHERE p.isAddedToCart = true")
+//    List<Product> getProductsInCart();
 
     @Query("SELECT p FROM Product p WHERE p.id = :productId")
     Product getProductById(@Param("productId") Integer productId);

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Typography, Link } from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/actions/AuthActions';
 
 type AuthMode = 'login' | 'signup';
 
@@ -15,33 +17,54 @@ const AuthForm: React.FC<Props> = ({ mode = 'login' }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  const dispatch = useDispatch();
 
   const validate = () => {
     const e: Record<string, string> = {};
+
     if (mode === 'signup' && !name.trim()) e.name = 'Name is required';
+
     if (!email.trim()) e.email = 'Email is required';
+
     // basic email pattern
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && !emailPattern.test(email)) e.email = 'Invalid email';
+
     if (!password) e.password = 'Password is required';
     if (password && password.length < 6) e.password = 'Password must be at least 6 characters';
+
     if (mode === 'signup') {
       if (!confirmPassword) e.confirmPassword = 'Confirm your password';
       if (password && confirmPassword && password !== confirmPassword) e.confirmPassword = 'Passwords do not match';
     }
+
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (ev?: React.FormEvent) => {
+  const handleSubmit = async (ev?: React.FormEvent) => {
     ev?.preventDefault();
     if (!validate()) return;
 
-    // TODO: replace with real API / Redux action
-    const payload = { name: mode === 'signup' ? name.trim() : undefined, email: email.trim(), password };
-    console.log(mode === 'signup' ? 'Signing up with' : 'Logging in with', payload);
+    console.log("Calling Login API with", { email, password });
+    try{
+      const res = await fetch(`http://localhost:8080/users/login?email=${email}&password=${password}`,{
+        method: 'GET'
+      });
 
-    // simple success flow: navigate home
+      if(!res.ok){
+        throw new Error('Failed to authenticate');
+      }
+      console.log("Response received from server" , res);
+      const data = await res.json();
+      dispatch(setUser({ user: data.username, email: email, token: data.jwtToken }));
+    }catch(err){
+      console.log("Error during authentication:", err);
+      throw new Error('Authentication error');
+    }
+
+    console.log("User signed in");
     navigate('/home');
   };
 
@@ -118,7 +141,7 @@ const AuthForm: React.FC<Props> = ({ mode = 'login' }) => {
         {mode === 'signup' ? (
           <>
             Already have an account?{' '}
-            <Link component={RouterLink} to="/login">
+            <Link component={RouterLink} to="/">
               Log in
             </Link>
           </>

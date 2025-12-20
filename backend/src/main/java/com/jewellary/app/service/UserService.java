@@ -1,10 +1,18 @@
 package com.jewellary.app.service;
 
+import com.jewellary.app.Entity.CartItem;
+import com.jewellary.app.Entity.Product;
 import com.jewellary.app.Entity.User;
+import com.jewellary.app.dto.UserAuthDTO;
 import com.jewellary.app.exceptions.UnauthorizedException;
-import com.jewellary.app.UserDTO;
+import com.jewellary.app.dto.UserDTO;
 import com.jewellary.app.repository.UserRepository;
+import com.jewellary.app.repository.WishlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +22,19 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
     private PasswordEncoder passwordEncoder;
-    // @Autowired
-    // private AuthenticationManager authManager;
+
+    @Autowired
+    AuthenticationManager authManager;
+    @Autowired
+    JwtService jwtService;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+            WishlistRepository wishlistRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public String signup(User user) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
@@ -31,15 +46,23 @@ public class UserService {
         return "Signup successful";
     }
 
-    public String login(String username, String password) {
+    public ResponseEntity<?> login(String username, String password) {
+        Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password));
+
+        if (!authentication.isAuthenticated()) {
+            throw new RuntimeException("Invalid login");
+        }
+        String jwt = jwtService.generateToken(authentication.getName());
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
+            UserAuthDTO userAuth = new UserAuthDTO(user.getUsername(), jwt);
             if (passwordEncoder.matches(password, user.getPassword()))
-                return "Login successful";
-            throw new UnauthorizedException("Invalid credentials");
+                return ResponseEntity.ok(userAuth);
+            return ResponseEntity.status(401).body("Invalid Credentials");
         } else {
-            throw new UnauthorizedException("User Not Found");
+            return ResponseEntity.status(401).body("User Not Found with username " + username);
         }
     }
 

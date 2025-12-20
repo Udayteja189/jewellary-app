@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "./Home";
-import Product from "../molecules/product";
+import { RootState } from "../../redux/store";
+import Product from "../molecules/Products";
+import { Product as ProductType } from "../../types/Product";
+
 import {
   Button,
   Grid,
@@ -32,14 +34,17 @@ const ResponsiveTypography = styled(Typography)(({ theme }) => ({
 }));
 
 const Cart = () => {
-  const products = useSelector(
-    (state: RootState) => state.allProducts.products
-  );
+  const products = useSelector((state: RootState) =>
+      state.cartProducts.products);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("Cart Products:", products);
+  }, [products]);
   return (
     <>
       <Stack
@@ -81,21 +86,20 @@ const Cart = () => {
         flexWrap="wrap"
         flexGrow="initial"
       >
-        {products.map((p) => {
-          const { image, index, originalPrice, discountPrice } = p;
+        {products.map((p:ProductType) => {
+          const { image, id, originalPrice, discountPrice } = p;
           return (
-            p.addedToCart && (
               <Product
-                src={image}
-                index={index}
-                alt={`Image ${index}`}
+                key={id}
+                image={image}
+                index={id}
+                alt={`Image ${id}`}
                 style={{ height: "200px" }}
                 originalPrice={originalPrice}
                 discountPrice={discountPrice}
-                addedToCart={p.addedToCart}
+                pageType="CART"
               />
-            )
-          );
+            );
         })}
       </Stack>
     </>
