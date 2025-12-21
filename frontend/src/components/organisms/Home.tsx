@@ -21,13 +21,13 @@ import Product from "../molecules/Products";
 import { Product as ProductType } from "../../types/Product";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { addToWishlist, setProducts, setProductsInCart, setWishListed } from "../../redux/actions/ProductActions";
+import { setProducts, setProductsInCart, setWishListed } from "../../redux/actions/ProductActions";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAppSelector } from "../../types/hooks";
 import { RootState } from "../../redux/store";
 import { WishlistItems } from "../../types/wishlist";
 import { CartItems } from "../../types/cart";
-// import { useDropzone } from "react-dropzone"; // removed (not used)
+import { logout } from "../../redux/actions/AuthActions";
 
 const StyledNavGrid = styled(Grid)(({ theme }) => ({
   height: "80px",
@@ -62,17 +62,12 @@ const Home = () => {
   const isMediumUp = useMediaQuery(theme.breakpoints.up("md"));
   const [isMediumOrSmaller, setIsMediumOrSmaller] = useState(false);
 
-  // const onDrop = useCallback((acceptedFiles: File[]) => {
-  //   // handle dropped files (unused in header)
-  //   console.log(acceptedFiles);
-  // }, []);
-
-  // const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop});
-
   const pages = ["Wishlists", "My Cart", "Account"];
+  const profileOptions = ["Edit Profile", "Logout"];
 
-  const [anchorElNav, setAnchorElNav] =
-    React.useState<null | HTMLElement>(null);
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  
+  const [profileMenuAnchorEl, setProfileMenuAnchorEl] = React.useState<null | HTMLElement>(null);
 
   useEffect(() => {
     setIsMediumOrSmaller(!isMediumUp); // true if viewport is medium or smaller
@@ -84,6 +79,16 @@ const Home = () => {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+  };
+
+  const handleOpenProfileMenu = (event: React.MouseEvent<HTMLElement>) => {
+    console.log("handle clicked")
+    setProfileMenuAnchorEl(event.currentTarget);
+    console.log("Profile menu anchor:", profileMenuAnchorEl)
+  };
+
+  const handleCloseProfileMenu = () => {
+    setProfileMenuAnchorEl(null);
   };
 
   const navigate = useNavigate();
@@ -152,13 +157,12 @@ const loadCart = async () => {
 
   // load products from API on mount and populate redux store
   useEffect(() => {
-  if (productsCount > 0) {
-    console.debug("Products already in store — skipping API fetch");
-    return;
-  }
+  if (!userAuthToken || !username) return;
 
   const init = async () => {
     try {
+      console.debug("Fetching data for user:", username);
+
       await Promise.all([
         loadProducts(),
         loadWishlist(),
@@ -168,29 +172,31 @@ const loadCart = async () => {
       console.error("Failed to initialize data", error);
     }
   };
-  console.log("Redux cart updated:", productsInCart);
 
   init();
-}, [productsCount, loadCart, loadWishlist, dispatch, productsInCart]);
+}, [userAuthToken, username]);
+
 
 
   const [searchValue, setSearchValue] = useState<string>("");
 
-  const handleProfileImg = () => {
-    // <div {...getRootProps()}>
-    //     <input {...getInputProps()} />
-    //     {
-    //       isDragActive ?
-    //         <p>Drop the files here ...</p> :
-    //         <button>Drag 'n' drop some files here, or click to select files </button>
-    //     }
-    //   </div>
-    console.log("Account icon clicked");
-  };
-
   const handleCart = () => {
     navigate("/cart");
   };
+
+  const handleProfile = (key:string) => {
+    switch (key) {
+      case "Edit Profile":
+        console.log("Edit Profile clicked");
+        break;
+      case "Logout":
+        dispatch(logout())
+        dispatch(setWishListed([]))
+        dispatch(setProductsInCart([]))
+        console.log("Logout clicked");
+        break;
+    }
+  }
 
   const handleMenuItems = (key: string) => {
     switch (
@@ -210,7 +216,7 @@ const loadCart = async () => {
 
   return (
     <div>
-      <StyledNavGrid>
+      <StyledNavGrid display="flex" key="nav-grid-container">
         <>
           <Stack
             display="flex"
@@ -279,7 +285,7 @@ const loadCart = async () => {
             <Stack
               display="flex"
               flexDirection="row"
-              justifyContent="center"
+              justifyContent="space-between"
               alignItems="center"
               gap="30px"
             >
@@ -301,10 +307,38 @@ const loadCart = async () => {
                 variant="standard" // can try with outlined
                 onChange={(e) => setSearchValue(e.target.value)}
               />
-              <Grid display="flex" alignItems="center" gap="20px">
-                <IconButton onClick={handleProfileImg}>
+              <Grid display="flex" alignItems="center" gap="18px" mr="2px" key="nav-icons">
+                <IconButton onClick={handleOpenProfileMenu}>
                   <AccountCircle sx={{ height: "30px", width: "30px" }} />
                 </IconButton>
+                <Menu
+                  id="menu-profilebar"
+                  anchorEl={profileMenuAnchorEl}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "left",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "left",
+                  }}
+                  open={Boolean(profileMenuAnchorEl)}
+                  onClose={handleCloseProfileMenu}
+                  keepMounted
+                >
+                  {profileOptions.map((option) => (
+                    <MenuItem
+                      key={option}
+                      onClick={() => {
+                        handleProfile(option);
+                        handleCloseProfileMenu();
+                      }}
+                    >
+                      <Typography textAlign="center">{option}</Typography>
+                    </MenuItem>
+                  ))}
+                </Menu>
+
                 <IconButton onClick={() => navigate("/wishlist")}>
                   <Badge badgeContent={wishlistedProducts.length} color="primary">
                     <FavoriteBorderIcon
