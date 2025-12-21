@@ -5,16 +5,17 @@ import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useDispatch } from "react-redux";
 import {
-  removeSelectedProducts,
+  addProductToCart,
+  addToWishlist,
+  removeProductFromCart,
   removeSelectedWishlist,
-  selectProducts,
-  selectWishlist,
 } from "../../redux/actions/ProductActions";
 import { toast } from "sonner";
+import { useAppSelector } from "../../types/hooks";
 
-interface ProductProps {
+interface ProductCardProps {
   index: string;
-  src: string;
+  image: string;
   alt: string;
   style: React.CSSProperties;
   handleWishList?: (id: string) => void;
@@ -23,11 +24,13 @@ interface ProductProps {
   discountPrice: string;
   wishlisted?: boolean;
   addedToCart?: boolean;
+  name?: string;
+  pageType?: string;
 }
 
 const Product = ({
   index,
-  src,
+  image,
   alt,
   style,
   handleWishList,
@@ -36,12 +39,17 @@ const Product = ({
   originalPrice,
   wishlisted,
   addedToCart,
-}: ProductProps) => {
+  pageType,
+}: ProductCardProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [liked, setLiked] = useState<boolean>(false);
   const [hovered, setHovered] = useState(false);
+  const [addedToCartState, setAddedToCartState] = useState<boolean>(addedToCart || false);
+  const [wishlistedState, setWishlistedState] = useState<boolean>(wishlisted || false);
+
+  const {user:username,token: userAuthToken} = useAppSelector((state) => state.auth);
 
   const handleMouseEnter = () => {
     setHovered(true);
@@ -51,21 +59,43 @@ const Product = ({
     setHovered(false);
   };
 
-  const handleLike = (id: string) => {
-    setLiked((value) => !value);
-    handleWishList?.(id);
+  const handleLike = async (id: string) => {
+    // setWishlistedState(true);
+    // setLiked((value) => !value);
+    const response = await fetch(`http://localhost:8080/v1/products/wishlist/${id}?username=${username}`,{
+            method: 'POST',
+             headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userAuthToken}`,
+            },
+    });
+    console.log("Response from adding to wishlist", response)
+    const json = await response.json();
+    const wishlisted = json.product;
+    dispatch(addToWishlist(wishlisted));
     toast.success("Item added to wishlist", { duration: 1000 });
-    dispatch(selectWishlist(id));
   };
 
   const handleParticularProduct = (id: string) => {
-    navigate(`product/${id}`);
+    console.log("Individual product clicked:", id);
+    navigate(`/product/${id}`);
   };
 
-  const handleAddToCart = (id: string) => {
+  const handleAddToCart = async(id: string) => {
+    setAddedToCartState(true);
     handleItemAddedToCart?.(id);
+    const response = await fetch(`http://localhost:8080/v1/products/cart/${id}?username=${username}`,{
+            method: 'POST',
+             headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userAuthToken}`,
+            },
+          });
+    console.log("Response from adding to cart", response)
     toast.success("Item added to Cart", { duration: 1000 });
-    dispatch(selectProducts(id));
+    const json = await response.json();
+    const productToAdd = json.product;
+    dispatch(addProductToCart(productToAdd));
   };
 
   const handleDelete = (id: string) => {
@@ -75,7 +105,7 @@ const Product = ({
       dispatch(removeSelectedWishlist(id));
     } else if (currentPath.match("/cart")) {
       toast.info("Item removed from cart", { duration: 1000 });
-      dispatch(removeSelectedProducts(id));
+      dispatch(removeProductFromCart(id));
     }
   };
 
@@ -100,7 +130,7 @@ const Product = ({
       <Icon
         key={index}
         alt={alt}
-        src={src}
+        src={image}
         style={style}
         onClick={() => handleParticularProduct(index)}
       />
@@ -114,7 +144,7 @@ const Product = ({
         <h3>
           <del>₹{originalPrice}</del> ₹{discountPrice}
         </h3>
-        {!wishlisted && (
+        {!wishlistedState && (
           <IconButton
             style={{ height: "40px", width: "40px" }}
             onClick={() => handleLike(index)}
@@ -137,13 +167,13 @@ const Product = ({
             )}
           </IconButton>
         )}
-        {(wishlisted || addedToCart) && (
+        {(wishlistedState || addedToCartState) && (
           <IconButton onClick={() => handleDelete(index)}>
             <DeleteIcon />
           </IconButton>
         )}
       </Stack>
-      {!addedToCart && hovered && (
+      {!addedToCartState && hovered && (
         <Button
           variant="contained"
           sx={{
@@ -153,7 +183,7 @@ const Product = ({
           }}
           onClick={() => handleAddToCart(index)}
         >
-          Add to Cart
+          {pageType === "CART" ? "Buy Now" : "Add to Cart"}
         </Button>
       )}
     </Grid>

@@ -1,8 +1,9 @@
 import { Button, Grid, Stack, styled, Typography, useMediaQuery, useTheme } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import {  useSelector } from "react-redux";
-import { RootState } from "./Home";
-import Product from "../molecules/product";
+import { RootState } from "../../redux/store";
+import Product from "../molecules/Products";
+import { Product as ProductType } from "../../types/Product";
 import { useNavigate } from "react-router-dom";
 
 const ResponsiveIcon = styled("img")(({ theme }) => ({
@@ -28,9 +29,16 @@ const Wishlist = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  const products = useSelector(
-    (state: RootState) => state.allProducts.products
-  );
+  const products = useSelector((state: RootState) =>
+    state.wishlistProducts.products);
+
+  console.log("products:", products);
+  console.log("isArray:", Array.isArray(products));
+  console.log("typeof:", typeof products);
+
+   useEffect(() => {
+      console.log("wishlist Products:", products);
+    });
 
 
   return (
@@ -60,7 +68,7 @@ const Wishlist = () => {
         </ResponsiveTypography>
       </Grid>
       <Grid display="flex" justifyContent={isSmallScreen ? 'center' : 'flex-end'}>
-        <Button onClick={() => navigate("/")}>Home</Button>
+        <Button onClick={() => navigate("/home")}>Home</Button>
       </Grid>
     </Stack>
       <Stack
@@ -68,23 +76,22 @@ const Wishlist = () => {
         flexDirection="row"
         width="100%"
         flexWrap="wrap"
-        flexGrow="initial"
+        // flexGrow="initial"
       >
-        {products.map((p) => {
-          const { image, index, originalPrice, discountPrice, liked } = p;
+        {products.map((p: ProductType) => {
+          const { image, id, originalPrice, discountPrice } = p;
           return (
-            p.liked && (
               <Product
-                src={image}
-                index={index}
-                alt={`Image ${index}`}
+                key = {id}
+                image={image}
+                index={id}
+                alt={`Image ${id}`}
                 style={{ height: "200px" }}
                 originalPrice={originalPrice}
                 discountPrice={discountPrice}
-                wishlisted={liked}
+                pageType="wishlist"
               />
-            )
-          );
+            );
         })}
       </Stack>
     </>

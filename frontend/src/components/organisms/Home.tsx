@@ -10,33 +10,24 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import Badge from "@mui/material/Badge";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import Product from "../molecules/product";
+import Product from "../molecules/Products";
+import { Product as ProductType } from "../../types/Product";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setProducts, setProductsInCart, setWishListed } from "../../redux/actions/ProductActions";
 import MenuIcon from "@mui/icons-material/Menu";
-
-export interface ProductProps {
-  index: string;
-  image: string;
-  category: string;
-  liked: boolean;
-  addedToCart: boolean;
-  originalPrice: string;
-  discountPrice: string;
-}
-
-export interface RootState {
-  allProducts: {
-    products: ProductProps[];
-  };
-}
+import { useAppSelector } from "../../types/hooks";
+import { RootState } from "../../redux/store";
+import { WishlistItems } from "../../types/wishlist";
+import { CartItems } from "../../types/cart";
+import { logout } from "../../redux/actions/AuthActions";
 
 const StyledNavGrid = styled(Grid)(({ theme }) => ({
   height: "80px",
@@ -72,9 +63,11 @@ const Home = () => {
   const [isMediumOrSmaller, setIsMediumOrSmaller] = useState(false);
 
   const pages = ["Wishlists", "My Cart", "Account"];
+  const profileOptions = ["Edit Profile", "Logout"];
 
-  const [anchorElNav, setAnchorElNav] =
-    React.useState<null | HTMLElement>(null);
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  
+  const [profileMenuAnchorEl, setProfileMenuAnchorEl] = React.useState<null | HTMLElement>(null);
 
   useEffect(() => {
     setIsMediumOrSmaller(!isMediumUp); // true if viewport is medium or smaller
@@ -88,41 +81,132 @@ const Home = () => {
     setAnchorElNav(null);
   };
 
+  const handleOpenProfileMenu = (event: React.MouseEvent<HTMLElement>) => {
+    console.log("handle clicked")
+    setProfileMenuAnchorEl(event.currentTarget);
+    console.log("Profile menu anchor:", profileMenuAnchorEl)
+  };
+
+  const handleCloseProfileMenu = () => {
+    setProfileMenuAnchorEl(null);
+  };
+
   const navigate = useNavigate();
   const products = useSelector(
     (state: RootState) => state.allProducts.products
   );
 
+  const wishlistedProducts = useSelector(
+    (state: RootState) => state.wishlistProducts.products
+  );
 
-  const [value, setValue] = useState<number>(0);
-  const [wishlistedCount,setWishlistedCount] = useState<number>(0);
+  const productsInCart = useSelector(
+    (state: RootState) => state.cartProducts.products
+  );
+
+  const dispatch = useDispatch();
+  const productsCount = products ? products.length : 0;
+
+  const {user:username,token: userAuthToken} = useAppSelector((state) => state.auth);
+
+  const fetchJson = async (url: string, options?: RequestInit) => {
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.json();
+  };
+
+  const loadProducts = async () => {
+  const data = await fetchJson("http://localhost:8080/v1/products");
+  dispatch(setProducts(data));
+};
+
+const loadWishlist = async () => {
+  const data: WishlistItems[] = await fetchJson(
+    `http://localhost:8080/v1/products/wishlisted?username=${username}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userAuthToken}`,
+      },
+    }
+  );
+
+  const productsOnly = data.map(item => item.product);
+
+  dispatch(setWishListed(productsOnly));
+};
+
+const loadCart = async () => {
+  const data:CartItems[] = await fetchJson(
+    `http://localhost:8080/v1/products/cart?username=${username}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userAuthToken}`,
+      },
+    }
+  );
+
+  const productsOnly = data.map(item => item.product);
+  dispatch(setProductsInCart(productsOnly));
+};
+
+
+
+  // load products from API on mount and populate redux store
+  useEffect(() => {
+  if (!userAuthToken || !username) return;
+
+  const init = async () => {
+    try {
+      console.debug("Fetching data for user:", username);
+
+      await Promise.all([
+        loadProducts(),
+        loadWishlist(),
+        loadCart(),
+      ]);
+    } catch (error) {
+      console.error("Failed to initialize data", error);
+    }
+  };
+
+  init();
+}, [userAuthToken, username]);
+
+
+
   const [searchValue, setSearchValue] = useState<string>("");
 
-  const handleLogin = () => {
-    console.log("Account icon clicked");
-  };
-
   const handleCart = () => {
-    navigate("cart");
+    navigate("/cart");
   };
 
-  useEffect(() => {
-    const productsInCart = products.filter((p) => p.addedToCart === true);
-    const productsInWishlist = products.filter((p) => p.liked === true);
-    setWishlistedCount(productsInWishlist.length);
-    setValue(productsInCart.length);
-  }, [products])
-
+  const handleProfile = (key:string) => {
+    switch (key) {
+      case "Edit Profile":
+        console.log("Edit Profile clicked");
+        break;
+      case "Logout":
+        dispatch(logout())
+        dispatch(setWishListed([]))
+        dispatch(setProductsInCart([]))
+        console.log("Logout clicked");
+        break;
+    }
+  }
 
   const handleMenuItems = (key: string) => {
     switch (
       key //Wishlists", "My Cart", "Account
     ) {
       case "Wishlists":
-        navigate("wishlist");
+        navigate("/wishlist");
         break;
       case "My Cart":
-        navigate("cart");
+        navigate("/cart");
         break;
       case "Account":
         console.log("Account menu items clicked");
@@ -132,13 +216,14 @@ const Home = () => {
 
   return (
     <div>
-      <StyledNavGrid>
+      <StyledNavGrid display="flex" key="nav-grid-container">
         <>
           <Stack
             display="flex"
             alignItems="center"
             justifyContent="center"
             m="0 5vh"
+            key="Company-Logo-Name"
           >
             {isMediumOrSmaller && (
               <>
@@ -181,7 +266,7 @@ const Home = () => {
               </>
             )}
           </Stack>
-          <Stack display="flex" flexDirection="row">
+          <Stack display="flex" flexDirection="row" key="right-nav-items">
             <ResponsiveIcon
               src="./images/ganeshLogo.png"
               alt="ganeshLogo"
@@ -200,7 +285,7 @@ const Home = () => {
             <Stack
               display="flex"
               flexDirection="row"
-              justifyContent="center"
+              justifyContent="space-between"
               alignItems="center"
               gap="30px"
             >
@@ -213,8 +298,7 @@ const Home = () => {
                       position="start"
                       sx={{ marginTop: "0px", p: "0" }}
                     >
-                      <IconButton
-                      >
+                      <IconButton>
                         <SearchIcon />
                       </IconButton>
                     </InputAdornment>
@@ -223,29 +307,55 @@ const Home = () => {
                 variant="standard" // can try with outlined
                 onChange={(e) => setSearchValue(e.target.value)}
               />
-              <Grid display="flex" alignItems="center" gap="20px">
-                <IconButton onClick={handleLogin}>
+              <Grid display="flex" alignItems="center" gap="18px" mr="2px" key="nav-icons">
+                <IconButton onClick={handleOpenProfileMenu}>
                   <AccountCircle sx={{ height: "30px", width: "30px" }} />
                 </IconButton>
+                <Menu
+                  id="menu-profilebar"
+                  anchorEl={profileMenuAnchorEl}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "left",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "left",
+                  }}
+                  open={Boolean(profileMenuAnchorEl)}
+                  onClose={handleCloseProfileMenu}
+                  keepMounted
+                >
+                  {profileOptions.map((option) => (
+                    <MenuItem
+                      key={option}
+                      onClick={() => {
+                        handleProfile(option);
+                        handleCloseProfileMenu();
+                      }}
+                    >
+                      <Typography textAlign="center">{option}</Typography>
+                    </MenuItem>
+                  ))}
+                </Menu>
+
                 <IconButton onClick={() => navigate("/wishlist")}>
-                <Badge
-                    badgeContent={wishlistedCount}
-                    color="primary"
-                  >
-                  <FavoriteBorderIcon sx={{ height: "30px", width: "30px" }} />
+                  <Badge badgeContent={wishlistedProducts.length} color="primary">
+                    <FavoriteBorderIcon
+                      sx={{ height: "30px", width: "30px" }}
+                    />
                   </Badge>
                 </IconButton>
                 <IconButton onClick={handleCart} disableRipple>
-                  <Badge
-                    badgeContent={value}
-                    color="primary"
-                  >
+                  <Badge badgeContent={productsInCart.length} color="primary">
                     <ShoppingCartIcon sx={{ height: "30px", width: "30px" }} />
                   </Badge>
                 </IconButton>
               </Grid>
             </Stack>
-          ) : <Stack/>}
+          ) : (
+            <Stack />
+          )}
         </>
       </StyledNavGrid>
       <Stack
@@ -257,30 +367,31 @@ const Home = () => {
         justifyContent="center"
       >
         {searchValue === ""
-          ? products.map((image) => (
-              <Product
-                key={image.index}
-                index={image.index}
-                src={image.image}
-                alt={`Image ${image.index}`}
-                style={{ height: "200px" }}
-                originalPrice={image.originalPrice}
-                discountPrice={image.discountPrice}
-              />
-            ))
-          : products
-              .filter((img) => img.category.includes(searchValue))
-              .map((image) => (
+          ? products.map((p:ProductType) => (
                 <Product
-                  key={image.index}
-                  index={image.index}
-                  src={image.image}
-                  alt={`Image ${image.index}`}
+                  key={p.id}
+                  index={p.id}
+                  image={p.image}
+                  alt={`Image ${p.id}`}
                   style={{ height: "200px" }}
-                  originalPrice={image.originalPrice}
-                  discountPrice={image.discountPrice}
+                  originalPrice={p.originalPrice}
+                  discountPrice={p.discountPrice}
+                  name={p.name}
                 />
-              ))}
+              ))
+          : products
+                .filter((img: { category: string}) => img.category.includes(searchValue))
+                .map((p: ProductType) => (
+                  <Product
+                    key={p.id}
+                    index={p.id}
+                    image={p.image}
+                    alt={`Image ${p.id}`}
+                    style={{ height: "200px" }}
+                    originalPrice={p.originalPrice}
+                    discountPrice={p.discountPrice}
+                  />
+                ))}
       </Stack>
     </div>
   );
