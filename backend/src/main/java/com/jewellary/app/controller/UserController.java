@@ -1,11 +1,9 @@
 package com.jewellary.app.controller;
 
-import com.jewellary.app.Entity.CartItem;
 import com.jewellary.app.Entity.User;
 import com.jewellary.app.dto.UserDTO;
-import com.jewellary.app.service.CartService;
+import com.jewellary.app.dto.UserLoginDTO;
 import com.jewellary.app.service.UserService;
-import com.jewellary.app.service.WishlistService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,13 +16,9 @@ import java.util.List;
 public class UserController {
 
     private UserService userService;
-    private CartService cartService;
-    private WishlistService wishlistService;
 
-    public UserController(UserService userService, CartService cartService, WishlistService wishlistService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.cartService = cartService;
-        this.wishlistService = wishlistService;
     }
 
     @PostMapping("/signup")
@@ -34,12 +28,11 @@ public class UserController {
         return "User details are not Valid";
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<?> login(@RequestParam("email") String email,
-            @RequestParam("password") String password) {
-        if (email == null || password == null)
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserLoginDTO user) {
+        if (user == null)
             return ResponseEntity.badRequest().body("Email or Password cannot be null");
-        return userService.login(email, password);
+        return userService.login(user.getUsername(), user.getPassword());
     }
 
     @GetMapping("/")

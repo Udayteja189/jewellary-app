@@ -47,10 +47,16 @@ const AuthForm: React.FC<Props> = ({ mode = 'login' }) => {
     ev?.preventDefault();
     if (!validate()) return;
 
-    console.log("Calling Login API with", { email, password });
     try{
-      const res = await fetch(`http://localhost:8080/users/login?email=${email}&password=${password}`,{
-        method: 'GET'
+      const res = await fetch(`http://localhost:8080/users/login`,{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+         body: JSON.stringify({
+         username: email,
+         password
+        })
       });
 
       if(!res.ok){

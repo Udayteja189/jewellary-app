@@ -20,11 +20,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
-
-    @Autowired
     JwtService jwtService;
-    @Autowired
     CustomUserDetailService customUserDetailService;
+
+    public JwtAuthFilter(JwtService jwtService, CustomUserDetailService customUserDetailService) {
+        this.jwtService = jwtService;
+        this.customUserDetailService = customUserDetailService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -32,6 +34,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String jwtToken = null;
         String username = null;
+        if (authHeader == null && request.getServletPath().equals("/users/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwtToken = authHeader.substring(7);
             username = jwtService.extractUserNameFromToken(jwtToken);

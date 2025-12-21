@@ -56,6 +56,34 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
+							"raw": "{\r\n    \"category\": \"earring\",\r\n    \"name\": \"Product 14\",\r\n    \"originalPrice\": 67000.00,\r\n    \"discountPrice\": 58780.00,\r\n    \"image\": \"https://www.lalithaajewellery.com/assets/img/jhumukki/2.webp\",\r\n    \"wishlisted\": false,\r\n    \"addedToCart\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/v1/products",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cart",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
 							"raw": "{\r\n    \"category\": \"earring\",\r\n    \"name\": \"Product 2\",\r\n    \"originalPrice\": 60000.00,\r\n    \"discountPrice\": 56780.00,\r\n    \"image\": \"https://www.lalithaajewellery.com/assets/img/jhumukki/2.webp\",\r\n    \"wishlisted\": false,\r\n    \"addedToCart\": false\r\n}",
 							"options": {
 								"raw": {
@@ -101,10 +129,20 @@
 				{
 					"name": "cartProducts",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhamF5QGVtYWlsLmNvbSIsImlhdCI6MTc2NjMwMTk3OCwiZXhwIjoxNzY2MzAzNzc4fQ.QkgsEQmHagR9GQiUyqYdJCw49OZBqPb5nsciOW-AejTl3z2hdKMl4FjLSOK7-Gq-",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/v1/products/cart",
+							"raw": "localhost:8080/v1/products/cart?username=ajay@email.com",
 							"host": [
 								"localhost"
 							],
@@ -113,6 +151,12 @@
 								"v1",
 								"products",
 								"cart"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "ajay@email.com"
+								}
 							]
 						}
 					},
@@ -214,28 +258,31 @@
 				},
 				{
 					"name": "login",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ1ZGF5QGVtYWlsLmNvbSIsImlhdCI6MTc2NDM5NDY3NywiZXhwIjoxNzY0Mzk2NDc3fQ._7SkFdPlHip5zzjYqEHdJZuQusmxpU874fbC6Z_XSZe084bLRiIqfHGC6YFow455",
+									"value": "",
 									"type": "string"
 								}
 							]
 						},
-						"method": "GET",
-						"header": [],
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"username\" : \"uday@email.com\",\r\n    \"password\": \"password\"\r\n}"
 						},
 						"url": {
-							"raw": "localhost:8080/users/login?email=uday@email.com&password=password",
+							"raw": "localhost:8080/users/login",
 							"host": [
 								"localhost"
 							],
@@ -243,16 +290,6 @@
 							"path": [
 								"users",
 								"login"
-							],
-							"query": [
-								{
-									"key": "email",
-									"value": "uday@email.com"
-								},
-								{
-									"key": "password",
-									"value": "password"
-								}
 							]
 						}
 					},
@@ -325,6 +362,104 @@
 							"path": [
 								"users",
 								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ1ZGF5QGVtYWlsLmNvbSIsImlhdCI6MTc2NTExMTQyMywiZXhwIjoxNzY1MTEzMjIzfQ.rRKiXjlJ360xoy9K2VAjZ1QtPEspBOm607wPT8t__RjXTWBAnxoAe8Gx2ab7eJdk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/users/cart/1?quantity=1&username=uday@email.com",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"cart",
+								"1"
+							],
+							"query": [
+								{
+									"key": "quantity",
+									"value": "1"
+								},
+								{
+									"key": "username",
+									"value": "uday@email.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wishlist",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ1ZGF5QGVtYWlsLmNvbSIsImlhdCI6MTc2NTExMTQyMywiZXhwIjoxNzY1MTEzMjIzfQ.rRKiXjlJ360xoy9K2VAjZ1QtPEspBOm607wPT8t__RjXTWBAnxoAe8Gx2ab7eJdk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/users/cart/1?quantity=1&username=uday@email.com",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"cart",
+								"1"
+							],
+							"query": [
+								{
+									"key": "quantity",
+									"value": "1"
+								},
+								{
+									"key": "username",
+									"value": "uday@email.com"
+								}
 							]
 						}
 					},
