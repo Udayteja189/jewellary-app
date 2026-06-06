@@ -1,4 +1,5 @@
 import React from "react";
+// @ts-ignore
 import "./App.css";
 import Home from "./components/organisms/Home";
 import Login from "./components/organisms/Login";
