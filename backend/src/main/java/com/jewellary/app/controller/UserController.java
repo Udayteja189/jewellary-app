@@ -1,6 +1,7 @@
 package com.jewellary.app.controller;
 
 import com.jewellary.app.Entity.User;
+import com.jewellary.app.dto.UserAuthDTO;
 import com.jewellary.app.dto.UserDTO;
 import com.jewellary.app.dto.UserLoginDTO;
 import com.jewellary.app.service.UserService;
@@ -22,10 +23,10 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public String signup(@RequestBody User user) {
+    public ResponseEntity<UserAuthDTO> signup(@RequestBody User user) {
         if (user != null)
             return userService.signup(user);
-        return "User details are not Valid";
+        throw new RuntimeException("User details are not Valid");
     }
 
     @PostMapping("/login")

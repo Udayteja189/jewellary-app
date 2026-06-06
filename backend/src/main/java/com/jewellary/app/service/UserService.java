@@ -1,10 +1,7 @@
 package com.jewellary.app.service;
 
-import com.jewellary.app.Entity.CartItem;
-import com.jewellary.app.Entity.Product;
 import com.jewellary.app.Entity.User;
 import com.jewellary.app.dto.UserAuthDTO;
-import com.jewellary.app.exceptions.UnauthorizedException;
 import com.jewellary.app.dto.UserDTO;
 import com.jewellary.app.repository.UserRepository;
 import com.jewellary.app.repository.WishlistRepository;
@@ -36,14 +33,15 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String signup(User user) {
+    public ResponseEntity<UserAuthDTO> signup(User user) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return "Username already taken";
+            throw new RuntimeException("Username already taken");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        return "Signup successful";
+        String jwt = jwtService.generateToken(user.getUsername());
+        return ResponseEntity.ok(new UserAuthDTO(user.getUsername(), jwt));
     }
 
     public ResponseEntity<?> login(String username, String password) {
