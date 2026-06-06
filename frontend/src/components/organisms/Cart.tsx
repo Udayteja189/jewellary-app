@@ -43,7 +43,6 @@ const Cart = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Cart Products:", products);
   }, [products]);
   return (
     <>
