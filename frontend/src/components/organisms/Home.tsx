@@ -82,9 +82,7 @@ const Home = () => {
   };
 
   const handleOpenProfileMenu = (event: React.MouseEvent<HTMLElement>) => {
-    console.log("handle clicked")
     setProfileMenuAnchorEl(event.currentTarget);
-    console.log("Profile menu anchor:", profileMenuAnchorEl)
   };
 
   const handleCloseProfileMenu = () => {
@@ -105,7 +103,6 @@ const Home = () => {
   );
 
   const dispatch = useDispatch();
-  const productsCount = products ? products.length : 0;
 
   const {user:username,token: userAuthToken} = useAppSelector((state) => state.auth);
 
@@ -161,7 +158,6 @@ const loadCart = async () => {
 
   const init = async () => {
     try {
-      console.debug("Fetching data for user:", username);
 
       await Promise.all([
         loadProducts(),
@@ -187,13 +183,12 @@ const loadCart = async () => {
   const handleProfile = (key:string) => {
     switch (key) {
       case "Edit Profile":
-        console.log("Edit Profile clicked");
+        console.log("Edit Profile clicked");  
         break;
       case "Logout":
         dispatch(logout())
         dispatch(setWishListed([]))
         dispatch(setProductsInCart([]))
-        console.log("Logout clicked");
         break;
     }
   }
@@ -209,7 +204,6 @@ const loadCart = async () => {
         navigate("/cart");
         break;
       case "Account":
-        console.log("Account menu items clicked");
         break;
     }
   };

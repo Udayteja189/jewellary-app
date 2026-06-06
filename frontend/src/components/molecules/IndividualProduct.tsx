@@ -44,17 +44,13 @@ const IndividualProduct = () => {
           Authorization: `Bearer ${userAuthToken}`,
         },
       });
-    console.log("Response from adding to cart", response)
     const productToAdd = response.json().then(data => {
         return data.product;
     })
     dispatch(addProductToCart(productToAdd));
-    console.log("after dispatch event - products in cart:", productsInCart);
   };
 
   useEffect(() => {
-    console.log("Products in IndividualProduct:", param.id);
-    console.log("All Products:", products);
   
     const selectedProduct = products?.find(
       (p) => String(p.id) === String(param.id)

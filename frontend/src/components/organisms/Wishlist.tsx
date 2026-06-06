@@ -32,15 +32,6 @@ const Wishlist = () => {
   const products = useSelector((state: RootState) =>
     state.wishlistProducts.products);
 
-  console.log("products:", products);
-  console.log("isArray:", Array.isArray(products));
-  console.log("typeof:", typeof products);
-
-   useEffect(() => {
-      console.log("wishlist Products:", products);
-    });
-
-
   return (
     <>
       <Stack

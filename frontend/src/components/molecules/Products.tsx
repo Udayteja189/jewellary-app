@@ -69,7 +69,6 @@ const Product = ({
               Authorization: `Bearer ${userAuthToken}`,
             },
     });
-    console.log("Response from adding to wishlist", response)
     const json = await response.json();
     const wishlisted = json.product;
     dispatch(addToWishlist(wishlisted));
@@ -77,7 +76,6 @@ const Product = ({
   };
 
   const handleParticularProduct = (id: string) => {
-    console.log("Individual product clicked:", id);
     navigate(`/product/${id}`);
   };
 
@@ -91,7 +89,6 @@ const Product = ({
               Authorization: `Bearer ${userAuthToken}`,
             },
           });
-    console.log("Response from adding to cart", response)
     toast.success("Item added to Cart", { duration: 1000 });
     const json = await response.json();
     const productToAdd = json.product;
