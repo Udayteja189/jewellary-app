@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   react:
+    build: ./frontend
     image: react-app
     ports:
       - "3000:3000"
