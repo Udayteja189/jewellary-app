@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  react:
+    build: ./frontend
+    image: react-app
+    ports:
+      - "3000:3000"
+  mysql:
+    image: mysql:8.0
+    environment:
+        MYSQL_ROOT_PASSWORD: Uday@1891
+        MYSQL_DATABASE: jewellaryApp
+    volumes:
+        - mysql-data:/var/lib/mysql
+  app:
+    build: ./backend
+    image: jewellery-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+        SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/jewellaryApp
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: Uday@1891
+        SPRING_JPA_HIBERNATE_DDL_AUTO: update
+        SPRING_JPA_SHOW_SQL: "true"
+
+volumes:
+  mysql-data:
