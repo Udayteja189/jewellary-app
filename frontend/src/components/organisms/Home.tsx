@@ -115,13 +115,13 @@ const Home = () => {
   };
 
   const loadProducts = async () => {
-  const data = await fetchJson("http://localhost:8080/v1/products");
+  const data = await fetchJson("/v1/products");
   dispatch(setProducts(data));
 };
 
 const loadWishlist = async () => {
   const data: WishlistItems[] = await fetchJson(
-    `http://localhost:8080/v1/products/wishlisted?username=${username}`,
+    `/v1/products/wishlisted?username=${username}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -137,7 +137,7 @@ const loadWishlist = async () => {
 
 const loadCart = async () => {
   const data:CartItems[] = await fetchJson(
-    `http://localhost:8080/v1/products/cart?username=${username}`,
+    `/v1/products/cart?username=${username}`,
     {
       headers: {
         "Content-Type": "application/json",

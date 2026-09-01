@@ -52,7 +52,7 @@ const AuthForm: React.FC<Props> = ({ mode = "login" }) => {
     try {
       let res, data;
       if (mode === "signup") {
-        res = await fetch("http://localhost:8080/users/signup", {
+        res = await fetch("/v1/users/signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -67,7 +67,7 @@ const AuthForm: React.FC<Props> = ({ mode = "login" }) => {
           }),
         });
       } else {
-        res = await fetch("http://localhost:8080/users/login", {
+        res = await fetch("/v1/users/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

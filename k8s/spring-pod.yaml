@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spring-pod
+  labels:
+    app: spring-app
+spec:
+  containers:
+  - name: spring-container
+    image: jewelry-backend:1.0
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 8080
+    env:
+    - name: SPRING_DATASOURCE_URL
+      value: jdbc:mysql://mysql-service:3306/jewellery_db
+    - name: SPRING_DATASOURCE_USERNAME
+      value:
+    - name: SPRING_DATASOURCE_PASSWORD
+      value:
+    - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+      value: update
+    - name: SPRING_JPA_SHOW_SQL
+      value: "true"

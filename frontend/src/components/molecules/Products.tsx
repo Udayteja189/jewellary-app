@@ -62,7 +62,7 @@ const Product = ({
   const handleLike = async (id: string) => {
     // setWishlistedState(true);
     // setLiked((value) => !value);
-    const response = await fetch(`http://localhost:8080/v1/products/wishlist/${id}?username=${username}`,{
+    const response = await fetch(`/v1/products/wishlist/${id}?username=${username}`,{
             method: 'POST',
              headers: {
               "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const Product = ({
   const handleAddToCart = async(id: string) => {
     setAddedToCartState(true);
     handleItemAddedToCart?.(id);
-    const response = await fetch(`http://localhost:8080/v1/products/cart/${id}?username=${username}`,{
+    const response = await fetch(`/v1/products/cart/${id}?username=${username}`,{
             method: 'POST',
              headers: {
               "Content-Type": "application/json",

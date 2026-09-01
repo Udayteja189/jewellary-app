@@ -26,7 +26,8 @@ public class SecurityConfig {
     @Autowired
     JwtAuthFilter jwtAuthFilter;
 
-    private static final String[] WHITE_LIST_APIS = new String[] { "/users/signup", "/users/login", "/auth","/v1/products/**" };
+    private static final String[] WHITE_LIST_APIS = new String[] { "/v1/users/signup", "/v1/users/login", "/v1/auth",
+            "v1/products/**" };
 
     @Bean
     public SecurityFilterChain doConfigure(HttpSecurity http) throws Exception {
