@@ -4,12 +4,12 @@ services:
     build: ./frontend
     container_name: jewellery-frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
   mysql:
     container_name: jewellary-mysql
     image: mysql:8.0
     environment:
-        MYSQL_ROOT_PASSWORD:
+        MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
         MYSQL_DATABASE: jewellaryApp
     volumes:
         - mysql-data:/var/lib/mysql
@@ -22,8 +22,8 @@ services:
       - mysql
     environment:
         SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/jewellaryApp
-        SPRING_DATASOURCE_USERNAME: 
-        SPRING_DATASOURCE_PASSWORD: 
+        SPRING_DATASOURCE_USERNAME: ${DATABASE_USERNAME}
+        SPRING_DATASOURCE_PASSWORD: ${DATABASE_PASSWORD}
         SPRING_JPA_HIBERNATE_DDL_AUTO: update
         SPRING_JPA_SHOW_SQL: "true"
 

@@ -15,9 +15,15 @@ spec:
     - name: SPRING_DATASOURCE_URL
       value: jdbc:mysql://mysql-service:3306/jewellery_db
     - name: SPRING_DATASOURCE_USERNAME
-      value:
+      valueFrom:
+        secretKeyRef:
+          name: mysqlsecret
+          key: MYSQL_USER
     - name: SPRING_DATASOURCE_PASSWORD
-      value:
+      valueFrom:
+        secretKeyRef:
+          name: mysqlsecret
+          key: MYSQL_PASSWORD
     - name: SPRING_JPA_HIBERNATE_DDL_AUTO
       value: update
     - name: SPRING_JPA_SHOW_SQL
