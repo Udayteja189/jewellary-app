@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-service
+  labels:
+    app: spring-app
+spec:
+  selector:
+    app: spring-app
+  # type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080  # port which we are exposing to the outside world
+      targetPort: 8080   # port the application is running ( Container port )
+      # nodePort: 30080

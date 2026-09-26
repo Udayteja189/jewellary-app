@@ -37,7 +37,7 @@ const IndividualProduct = () => {
 
     const handleItemAddedToCart = async (id: string) => {
     toast.success("Item added to cart",{duration:1000})
-    const response = await fetch(`http://localhost:8080/v1/products/cart/${id}?username=${username}`,{
+    const response = await fetch(`/v1/products/cart/${id}?username=${username}`,{
         method: 'POST',
          headers: {
           "Content-Type": "application/json",

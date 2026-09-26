@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: react-pod
+  labels:
+    app: react-app
+spec:
+  containers:
+    - name: react-container
+      image: jewelry-frontend:1.0
+      imagePullPolicy: IfNotPresent
+      ports:
+      - containerPort: 80
